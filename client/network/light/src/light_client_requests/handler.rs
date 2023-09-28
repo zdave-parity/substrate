@@ -79,7 +79,7 @@ where
 		);
 		protocol_config.inbound_queue = Some(tx);
 
-		(Self { client, request_receiver, _block: PhantomData::default() }, protocol_config)
+		(Self { client, request_receiver, _block: PhantomData }, protocol_config)
 	}
 
 	/// Run [`LightClientRequestHandler`].

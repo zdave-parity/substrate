@@ -50,7 +50,7 @@ pub struct Dev<Block: BlockT, Client> {
 impl<Block: BlockT, Client> Dev<Block, Client> {
 	/// Create a new Dev API.
 	pub fn new(client: Arc<Client>, deny_unsafe: DenyUnsafe) -> Self {
-		Self { client, deny_unsafe, _phantom: PhantomData::default() }
+		Self { client, deny_unsafe, _phantom: PhantomData }
 	}
 }
 
