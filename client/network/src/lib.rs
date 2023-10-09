@@ -243,6 +243,7 @@
 //! More precise usage details are still being worked on and will likely change in the future.
 
 mod behaviour;
+mod ipfs;
 mod peer_store;
 mod peerset;
 mod protocol;
@@ -261,6 +262,10 @@ pub mod types;
 pub mod utils;
 
 pub use event::{DhtEvent, Event, SyncEvent};
+pub use ipfs::{
+	BlockProvider as IpfsBlockProvider, HasMultihashCode,
+	IndexedTransactions as IpfsIndexedTransactions,
+};
 #[doc(inline)]
 pub use libp2p::{multiaddr, Multiaddr, PeerId};
 pub use request_responses::{Config, IfDisconnected, RequestFailure};

@@ -929,6 +929,7 @@ where
 			metrics_registry: None,
 			block_announce_config,
 			tx,
+			ipfs_block_provider: None,
 		})
 		.unwrap();
 

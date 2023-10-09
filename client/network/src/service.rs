@@ -351,6 +351,7 @@ where
 					discovery_config,
 					request_response_protocols,
 					peerset_handle.clone(),
+					params.ipfs_block_provider,
 				);
 
 				match result {
@@ -1572,10 +1573,12 @@ where
 					let reason = match cause {
 						Some(ConnectionError::IO(_)) => "transport-error",
 						Some(ConnectionError::Handler(Either::Left(Either::Left(
-							Either::Right(Either::Left(PingFailure::Timeout)),
+							Either::Left(Either::Right(Either::Left(PingFailure::Timeout))),
 						)))) => "ping-timeout",
 						Some(ConnectionError::Handler(Either::Left(Either::Left(
-							Either::Left(NotifsHandlerError::SyncNotificationsClogged),
+							Either::Left(Either::Left(
+								NotifsHandlerError::SyncNotificationsClogged,
+							)),
 						)))) => "sync-notifications-clogged",
 						Some(ConnectionError::Handler(_)) => "protocol-error",
 						Some(ConnectionError::KeepAliveTimeout) => "keep-alive-timeout",

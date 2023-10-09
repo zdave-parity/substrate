@@ -47,7 +47,6 @@ members = [
 	"client/network/transactions",
 	"client/network/statement",
 	"client/network-gossip",
-	"client/network/bitswap",
 	"client/network/common",
 	"client/network/light",
 	"client/network/sync",

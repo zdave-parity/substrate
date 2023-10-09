@@ -43,9 +43,9 @@ use sc_executor::{
 use sc_keystore::LocalKeystore;
 use sc_network::{
 	config::{FullNetworkConfiguration, SyncMode},
-	NetworkService, NetworkStateInfo, NetworkStatusProvider,
+	HasMultihashCode, IpfsBlockProvider, IpfsIndexedTransactions, NetworkService, NetworkStateInfo,
+	NetworkStatusProvider,
 };
-use sc_network_bitswap::BitswapRequestHandler;
 use sc_network_common::{role::Roles, sync::warp::WarpSyncParams};
 use sc_network_light::light_client_requests::handler::LightClientRequestHandler;
 use sc_network_sync::{
@@ -72,7 +72,7 @@ use sp_consensus::block_validation::{
 };
 use sp_core::traits::{CodeExecutor, SpawnNamed};
 use sp_keystore::KeystorePtr;
-use sp_runtime::traits::{Block as BlockT, BlockIdTo, NumberFor, Zero};
+use sp_runtime::traits::{Block as BlockT, BlockIdTo, Header, NumberFor, Zero};
 use std::{
 	str::FromStr,
 	sync::Arc,
@@ -726,6 +726,7 @@ pub fn build_network<TBl, TExPool, TImpQu, TCl>(
 >
 where
 	TBl: BlockT,
+	<TBl::Header as Header>::Hashing: HasMultihashCode,
 	TCl: ProvideRuntimeApi<TBl>
 		+ HeaderMetadata<TBl, Error = sp_blockchain::Error>
 		+ Chain<TBl>
@@ -839,12 +840,6 @@ where
 		net_config.add_request_response_protocol(config);
 	}
 
-	if config.network.ipfs_server {
-		let (handler, protocol_config) = BitswapRequestHandler::new(client.clone());
-		spawn_handle.spawn("bitswap-request-handler", Some("networking"), handler.run());
-		net_config.add_request_response_protocol(protocol_config);
-	}
-
 	// create transactions protocol and add it to the list of supported protocols of
 	// `network_params`
 	let transactions_handler_proto = sc_network_transactions::TransactionsHandlerPrototype::new(
@@ -895,6 +890,9 @@ where
 		metrics_registry: config.prometheus_config.as_ref().map(|config| config.registry.clone()),
 		block_announce_config,
 		tx,
+		ipfs_block_provider: config.network.ipfs_server.then(|| {
+			Arc::new(IpfsIndexedTransactions::new(client.clone())) as Arc<dyn IpfsBlockProvider>
+		}),
 	};
 
 	let has_bootnodes = !network_params.network_config.network_config.boot_nodes.is_empty();

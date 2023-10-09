@@ -32,6 +32,7 @@ pub use crate::{
 
 pub use libp2p::{identity::Keypair, multiaddr, Multiaddr, PeerId};
 
+use crate::ipfs::BlockProvider as IpfsBlockProvider;
 use codec::Encode;
 use prometheus_endpoint::Registry;
 use zeroize::Zeroize;
@@ -55,6 +56,7 @@ use std::{
 	path::{Path, PathBuf},
 	pin::Pin,
 	str::{self, FromStr},
+	sync::Arc,
 };
 
 pub use libp2p::{
@@ -579,7 +581,7 @@ pub struct NetworkConfiguration {
 	/// `kademlia_replication_factor` peers to consider record successfully put.
 	pub kademlia_replication_factor: NonZeroUsize,
 
-	/// Enable serving block data over IPFS bitswap.
+	/// Enable serving block data over IPFS.
 	pub ipfs_server: bool,
 
 	/// Size of Yamux receive window of all substreams. `None` for the default (256kiB).
@@ -697,6 +699,9 @@ pub struct Params<Block: BlockT> {
 
 	/// TX channel for direct communication with `SyncingEngine` and `Protocol`.
 	pub tx: TracingUnboundedSender<crate::event::SyncEvent<Block>>,
+
+	/// Block provider for IPFS.
+	pub ipfs_block_provider: Option<Arc<dyn IpfsBlockProvider>>,
 }
 
 /// Full network configuration.
