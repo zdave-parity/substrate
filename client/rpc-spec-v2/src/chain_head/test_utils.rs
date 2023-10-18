@@ -27,6 +27,7 @@ use sc_utils::mpsc::{tracing_unbounded, TracingUnboundedSender};
 use sp_api::{CallApiAt, CallApiAtParams, NumberFor, RuntimeVersion};
 use sp_blockchain::{BlockStatus, CachedHeaderMetadata, HeaderBackend, HeaderMetadata, Info};
 use sp_consensus::BlockOrigin;
+use sp_core::H256;
 use sp_runtime::{
 	generic::SignedBlock,
 	traits::{Block as BlockT, Header as HeaderT},
@@ -253,11 +254,11 @@ impl<Block: BlockT, Client: BlockBackend<Block>> BlockBackend<Block>
 		self.client.block_hash(number)
 	}
 
-	fn indexed_transaction(&self, hash: Block::Hash) -> sp_blockchain::Result<Option<Vec<u8>>> {
+	fn indexed_transaction(&self, hash: H256) -> sp_blockchain::Result<Option<Vec<u8>>> {
 		self.client.indexed_transaction(hash)
 	}
 
-	fn has_indexed_transaction(&self, hash: Block::Hash) -> sp_blockchain::Result<bool> {
+	fn has_indexed_transaction(&self, hash: H256) -> sp_blockchain::Result<bool> {
 		self.client.has_indexed_transaction(hash)
 	}
 

@@ -43,7 +43,7 @@ use sc_executor::{
 use sc_keystore::LocalKeystore;
 use sc_network::{
 	config::{FullNetworkConfiguration, SyncMode},
-	HasMultihashCode, IpfsBlockProvider, IpfsIndexedTransactions, NetworkService, NetworkStateInfo,
+	IpfsBlockProvider, IpfsIndexedTransactions, NetworkService, NetworkStateInfo,
 	NetworkStatusProvider,
 };
 use sc_network_common::{role::Roles, sync::warp::WarpSyncParams};
@@ -72,7 +72,7 @@ use sp_consensus::block_validation::{
 };
 use sp_core::traits::{CodeExecutor, SpawnNamed};
 use sp_keystore::KeystorePtr;
-use sp_runtime::traits::{Block as BlockT, BlockIdTo, Header, NumberFor, Zero};
+use sp_runtime::traits::{Block as BlockT, BlockIdTo, NumberFor, Zero};
 use std::{
 	str::FromStr,
 	sync::Arc,
@@ -726,7 +726,6 @@ pub fn build_network<TBl, TExPool, TImpQu, TCl>(
 >
 where
 	TBl: BlockT,
-	<TBl::Header as Header>::Hashing: HasMultihashCode,
 	TCl: ProvideRuntimeApi<TBl>
 		+ HeaderMetadata<TBl, Error = sp_blockchain::Error>
 		+ Chain<TBl>

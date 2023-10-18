@@ -263,8 +263,7 @@ pub mod utils;
 
 pub use event::{DhtEvent, Event, SyncEvent};
 pub use ipfs::{
-	BlockProvider as IpfsBlockProvider, HasMultihashCode,
-	IndexedTransactions as IpfsIndexedTransactions,
+	BlockProvider as IpfsBlockProvider, IndexedTransactions as IpfsIndexedTransactions,
 };
 #[doc(inline)]
 pub use libp2p::{multiaddr, Multiaddr, PeerId};

@@ -20,4 +20,4 @@ mod bitswap;
 mod block_provider;
 
 pub use bitswap::Behaviour;
-pub use block_provider::{BlockProvider, HasMultihashCode, IndexedTransactions};
+pub use block_provider::{BlockProvider, IndexedTransactions};

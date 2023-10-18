@@ -20,7 +20,7 @@ use cid::multihash::Multihash;
 use core::marker::PhantomData;
 use log::debug;
 use sc_client_api::BlockBackend;
-use sp_runtime::traits::{BlakeTwo256, Block, Hash, Header};
+use sp_runtime::traits::{BlakeTwo256, Block, Hash};
 use std::sync::Arc;
 
 const LOG_TARGET: &str = "ipfs";
@@ -37,7 +37,7 @@ pub trait BlockProvider: Send + Sync {
 
 /// Implemented for hasher types such as [`BlakeTwo256`], providing the corresponding Multihash
 /// code.
-pub trait HasMultihashCode {
+trait HasMultihashCode {
 	/// The Multihash code for the hasher.
 	const MULTIHASH_CODE: u64;
 }
@@ -75,15 +75,13 @@ impl<B, C> IndexedTransactions<B, C> {
 	}
 }
 
-impl<H, B, C> BlockProvider for IndexedTransactions<B, C>
+impl<B, C> BlockProvider for IndexedTransactions<B, C>
 where
-	H: Hash + HasMultihashCode,
-	B: Block<Hash = H::Output>,
-	B::Header: Header<Hashing = H>,
+	B: Block,
 	C: BlockBackend<B> + Send + Sync,
 {
 	fn have(&self, multihash: &Multihash) -> bool {
-		let Some(hash) = try_from_multihash::<H>(multihash) else { return false };
+		let Some(hash) = try_from_multihash::<BlakeTwo256>(multihash) else { return false };
 		match self.client.has_indexed_transaction(hash) {
 			Ok(have) => have,
 			Err(err) => {
@@ -94,7 +92,7 @@ where
 	}
 
 	fn get(&self, multihash: &Multihash) -> Option<Vec<u8>> {
-		let Some(hash) = try_from_multihash::<H>(multihash) else { return None };
+		let Some(hash) = try_from_multihash::<BlakeTwo256>(multihash) else { return None };
 		match self.client.indexed_transaction(hash) {
 			Ok(block) => block,
 			Err(err) => {

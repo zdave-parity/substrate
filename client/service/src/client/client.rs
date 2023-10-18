@@ -63,6 +63,7 @@ use sp_core::{
 		StorageKey,
 	},
 	traits::{CallContext, SpawnNamed},
+	H256,
 };
 use sp_runtime::{
 	generic::{BlockId, SignedBlock},
@@ -2025,11 +2026,11 @@ where
 		self.backend.blockchain().hash(number)
 	}
 
-	fn indexed_transaction(&self, hash: Block::Hash) -> sp_blockchain::Result<Option<Vec<u8>>> {
+	fn indexed_transaction(&self, hash: H256) -> sp_blockchain::Result<Option<Vec<u8>>> {
 		self.backend.blockchain().indexed_transaction(hash)
 	}
 
-	fn has_indexed_transaction(&self, hash: Block::Hash) -> sp_blockchain::Result<bool> {
+	fn has_indexed_transaction(&self, hash: H256) -> sp_blockchain::Result<bool> {
 		self.backend.blockchain().has_indexed_transaction(hash)
 	}
 
