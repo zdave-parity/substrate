@@ -257,7 +257,12 @@ pub trait Backend<Block: BlockT>:
 		Ok(self.indexed_transaction(hash)?.is_some())
 	}
 
+	/// Get all indexed transactions in a block, including renewed transactions.
 	fn block_indexed_body(&self, hash: Block::Hash) -> Result<Option<Vec<Vec<u8>>>>;
+
+	/// Get the BLAKE2b-256 hashes of all indexed transactions in a block, including renewed
+	/// transactions.
+	fn block_indexed_hashes(&self, hash: Block::Hash) -> Result<Option<Vec<H256>>>;
 }
 
 /// Blockchain info

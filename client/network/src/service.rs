@@ -351,6 +351,7 @@ where
 					discovery_config,
 					request_response_protocols,
 					peerset_handle.clone(),
+					network_config.ipfs,
 					params.ipfs_block_provider,
 				);
 

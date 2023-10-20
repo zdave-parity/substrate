@@ -19,7 +19,7 @@
 use crate::{
 	discovery::{DiscoveryBehaviour, DiscoveryConfig, DiscoveryOut},
 	event::DhtEvent,
-	ipfs::{Behaviour as IpfsBehaviour, BlockProvider as IpfsBlockProvider},
+	ipfs::{Behaviour as IpfsBehaviour, BlockProvider as IpfsBlockProvider, Config as IpfsConfig},
 	peer_info,
 	peerset::PeersetHandle,
 	protocol::{CustomMessageOutcome, NotificationsSink, Protocol},
@@ -178,8 +178,16 @@ impl<B: BlockT> Behaviour<B> {
 		disco_config: DiscoveryConfig,
 		request_response_protocols: Vec<ProtocolConfig>,
 		peerset: PeersetHandle,
+		ipfs_config: Option<IpfsConfig>,
 		ipfs_block_provider: Option<Arc<dyn IpfsBlockProvider>>,
 	) -> Result<Self, request_responses::RegisterError> {
+		let ipfs = if let (Some(config), Some(block_provider)) = (ipfs_config, ipfs_block_provider)
+		{
+			Some(IpfsBehaviour::new(config, local_public_key.to_peer_id(), block_provider))
+		} else {
+			None
+		}
+		.into();
 		Ok(Self {
 			substrate,
 			peer_info: peer_info::PeerInfoBehaviour::new(user_agent, local_public_key),
@@ -188,7 +196,7 @@ impl<B: BlockT> Behaviour<B> {
 				request_response_protocols.into_iter(),
 				peerset,
 			)?,
-			ipfs: ipfs_block_provider.map(IpfsBehaviour::new).into(),
+			ipfs,
 		})
 	}
 
@@ -259,6 +267,9 @@ impl<B: BlockT> Behaviour<B> {
 		supported_protocols: &[impl AsRef<[u8]>],
 		addr: Multiaddr,
 	) {
+		if let Some(ipfs) = self.ipfs.as_mut() {
+			ipfs.add_self_reported_address(peer_id, supported_protocols, &addr);
+		}
 		self.discovery.add_self_reported_address(peer_id, supported_protocols, addr);
 	}
 

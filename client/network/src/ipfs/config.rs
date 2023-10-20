@@ -16,12 +16,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-mod behaviour;
-mod bitswap;
-mod block_provider;
-mod config;
-mod dht;
+use super::super::config::MultiaddrWithPeerId;
 
-pub use behaviour::Behaviour;
-pub use block_provider::{BlockProvider, IndexedTransactions};
-pub use config::Config;
+/// IPFS server configuration.
+#[derive(Clone, Debug)]
+pub struct Config {
+	/// List of initial nodes for the DHT.
+	pub boot_nodes: Vec<MultiaddrWithPeerId>,
+}

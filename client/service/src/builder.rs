@@ -34,7 +34,7 @@ use sc_client_api::{
 	execution_extensions::ExecutionExtensions, proof_provider::ProofProvider, BadBlocks,
 	BlockBackend, BlockchainEvents, ExecutorProvider, ForkBlocks, StorageProvider, UsageProvider,
 };
-use sc_client_db::{Backend, DatabaseSettings};
+use sc_client_db::{Backend, BlocksPruning, DatabaseSettings};
 use sc_consensus::import_queue::ImportQueue;
 use sc_executor::{
 	sp_wasm_interface::HostFunctions, HeapAllocStrategy, NativeElseWasmExecutor,
@@ -874,6 +874,10 @@ where
 	let sync_service = Arc::new(sync_service);
 
 	let genesis_hash = client.hash(Zero::zero()).ok().flatten().expect("Genesis block exists; qed");
+	let num_blocks_kept = match config.blocks_pruning {
+		BlocksPruning::KeepAll | BlocksPruning::KeepFinalized => u32::MAX,
+		BlocksPruning::Some(num) => num,
+	};
 	let network_params = sc_network::config::Params::<TBl> {
 		role: config.role.clone(),
 		executor: {
@@ -889,8 +893,9 @@ where
 		metrics_registry: config.prometheus_config.as_ref().map(|config| config.registry.clone()),
 		block_announce_config,
 		tx,
-		ipfs_block_provider: config.network.ipfs_server.then(|| {
-			Arc::new(IpfsIndexedTransactions::new(client.clone())) as Arc<dyn IpfsBlockProvider>
+		ipfs_block_provider: config.network.ipfs.is_some().then(|| {
+			Arc::new(IpfsIndexedTransactions::new(client.clone(), num_blocks_kept))
+				as Arc<dyn IpfsBlockProvider>
 		}),
 	};
 

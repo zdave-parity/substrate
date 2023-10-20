@@ -23,6 +23,7 @@
 
 pub use crate::{
 	discovery::DEFAULT_KADEMLIA_REPLICATION_FACTOR,
+	ipfs::Config as IpfsConfig,
 	protocol::NotificationsSink,
 	request_responses::{
 		IncomingRequest, OutgoingResponse, ProtocolConfig as RequestResponseConfig,
@@ -581,8 +582,8 @@ pub struct NetworkConfiguration {
 	/// `kademlia_replication_factor` peers to consider record successfully put.
 	pub kademlia_replication_factor: NonZeroUsize,
 
-	/// Enable serving block data over IPFS.
-	pub ipfs_server: bool,
+	/// IPFS server config. If `None`, block data is not served over IPFS.
+	pub ipfs: Option<IpfsConfig>,
 
 	/// Size of Yamux receive window of all substreams. `None` for the default (256kiB).
 	/// Any value less than 256kiB is invalid.
@@ -635,7 +636,7 @@ impl NetworkConfiguration {
 			kademlia_replication_factor: NonZeroUsize::new(DEFAULT_KADEMLIA_REPLICATION_FACTOR)
 				.expect("value is a constant; constant is non-zero; qed."),
 			yamux_window_size: None,
-			ipfs_server: false,
+			ipfs: None,
 		}
 	}
 

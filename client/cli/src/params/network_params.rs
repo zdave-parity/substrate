@@ -20,7 +20,8 @@ use crate::{arg_enums::SyncMode, params::node_key_params::NodeKeyParams};
 use clap::Args;
 use sc_network::{
 	config::{
-		NetworkConfiguration, NodeKeyConfig, NonReservedPeerMode, SetConfig, TransportConfig,
+		IpfsConfig, NetworkConfiguration, NodeKeyConfig, NonReservedPeerMode, SetConfig,
+		TransportConfig,
 	},
 	multiaddr::Protocol,
 };
@@ -128,9 +129,13 @@ pub struct NetworkParams {
 	#[arg(long, default_value = "20")]
 	pub kademlia_replication_factor: NonZeroUsize,
 
-	/// Join the IPFS network and serve transactions over bitswap protocol.
+	/// Publish transactions on the IPFS network.
 	#[arg(long)]
 	pub ipfs_server: bool,
+
+	/// Specify a list of IPFS bootnodes.
+	#[arg(long, value_name = "ADDR", num_args = 1..)]
+	pub ipfs_bootnodes: Vec<MultiaddrWithPeerId>,
 
 	/// Blockchain syncing mode.
 	#[arg(
@@ -242,7 +247,7 @@ impl NetworkParams {
 			kademlia_disjoint_query_paths: self.kademlia_disjoint_query_paths,
 			kademlia_replication_factor: self.kademlia_replication_factor,
 			yamux_window_size: None,
-			ipfs_server: self.ipfs_server,
+			ipfs: self.ipfs_server.then(|| IpfsConfig { boot_nodes: self.ipfs_bootnodes.clone() }),
 			sync_mode: self.sync.into(),
 		}
 	}
